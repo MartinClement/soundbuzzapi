@@ -3,20 +3,28 @@
 namespace App\Controller;
 
 
-use App\Entity\UserEntity as User;
+use App\Entity\UserEntity;
 use App\Utils\APIResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends Controller
 {
+
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
 
     // GET
 
     public function getUsers() {
 
         $users = $this->getDoctrine()
-            ->getRepository(User::class)
+            ->getRepository(UserEntity::class)
             ->findAll();
 
         $_data = array('users' => array());
@@ -35,7 +43,7 @@ class UserController extends Controller
     public function getUserById($id) {
 
         $user = $this->getDoctrine()
-            ->getRepository(User::class)
+            ->getRepository(UserEntity::class)
             ->find($id);
 
         if(!$user) {
@@ -67,7 +75,10 @@ class UserController extends Controller
                 $user->setEmail($content['email']);
                 $user->setFullName($content['fullname']);
                 $user->setUsername($content['username']);
-                $user->setPassword($content['password']);
+
+                $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
+
+                $user->setPassword($userPassword);
 
                 $em->persist($user);
                 $em->flush();
@@ -100,7 +111,7 @@ class UserController extends Controller
                 $content = json_decode($content, true);
                 $em = $this->getDoctrine()->getManager();
 
-                $user = $em->getRepository(User::class)->find($id);
+                $user = $em->getRepository(UserEntity::class)->find($id);
                 $user->setEmail($content['email']);
                 $user->setFullName($content['fullname']);
                 $user->setUsername($content['username']);
@@ -125,6 +136,36 @@ class UserController extends Controller
             APIResponse::HTTP_BAD_REQUEST);
     }
 
+    public function updateUserPassword(Request $request, $id) {
+
+        if ($request->isMethod(Request::METHOD_PUT)) {
+
+            if ($content = $request->getContent()) {
+
+                $content = json_decode($content, true);
+                $em = $this->getDoctrine()->getManager();
+
+                $user = $em->getRepository(UserEntity::class)->find($id);
+
+                $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
+
+                $user->setPassword($userPassword);
+
+                $em->persist($user);
+                $em->flush();
+
+                $responseContent = json_encode($this->_getUserInfos($user));
+                return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+
+            } else {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NO_CONTENT), APIResponse::HTTP_NO_CONTENT);
+            }
+        }
+
+    }
+
     // DELETE
 
     public function deleteUser(Request $request, $id) {
@@ -134,7 +175,7 @@ class UserController extends Controller
 
             $em = $this->getDoctrine()->getManager();
 
-            $user = $em->getRepository(User::class)->find($id);
+            $user = $em->getRepository(UserEntity::class)->find($id);
 
             if(!$user) {
 
@@ -161,7 +202,7 @@ class UserController extends Controller
 // PRIVATE FUNCTIONS
 //
 
-    private function _getUserInfos(User $user) {
+    private function _getUserInfos(UserEntity $user) {
 
         return array(
             'id' => $user->getID(),

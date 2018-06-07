@@ -18,6 +18,10 @@ updateuser:
     path: /updateuser/{id}
     controller: App\Controller\UserController::updateUser
 
+updateuserpassword:
+    path: /updateuserpassword/{id}
+    controller: App\Controller\UserController::updateUserPassword
+
 deleteuser:
     path: /deleteuser/{id}
     controller: App\COntroller\UserController::deleteUser
