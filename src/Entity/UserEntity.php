@@ -56,6 +56,20 @@ class UserEntity implements UserInterface, \Serializable
     private $password;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
+
+    /**
      * @var array
      *
      * @ORM\Column(type="json")
@@ -105,6 +119,27 @@ class UserEntity implements UserInterface, \Serializable
     public function setPassword(string $password): void
     {
         $this->password = $password;
+    }
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\Datetime $date): void
+    {
+        $this->createdAt = $date;
+    }
+
+
+    public function getUpdatedAt(): \DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\Datetime $date): void
+    {
+        $this->updatedAt = $date;
     }
 
     /**

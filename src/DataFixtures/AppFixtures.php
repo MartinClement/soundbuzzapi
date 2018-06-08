@@ -30,6 +30,8 @@ class AppFixtures extends Fixture
             $user->setUsername($username);
             $user->setPassword($this->passwordEncoder->encodePassword($user, $password));
             $user->setEmail($email);
+            $user->setCreatedAt(new \Datetime('now'));
+            $user->setUpdatedAt(new \Datetime('now'));
             $user->setRoles($roles);
 
             $manager->persist($user);

@@ -75,6 +75,8 @@ class UserController extends Controller
                 $user->setEmail($content['email']);
                 $user->setFullName($content['fullname']);
                 $user->setUsername($content['username']);
+                $user->setCreatedAt(new \Datetime('now'));
+                $user->setUpdatedAt(new \Datetime('now'));
 
                 $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
 
@@ -116,6 +118,7 @@ class UserController extends Controller
                 $user->setFullName($content['fullname']);
                 $user->setUsername($content['username']);
                 $user->setRoles($content['roles']);
+                $user->setUpdatedAt(new \Datetime('now'));
 
                 $em->persist($user);
                 $em->flush();
@@ -150,6 +153,7 @@ class UserController extends Controller
                 $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
 
                 $user->setPassword($userPassword);
+                $user->setUpdatedAt(new \Datetime('now'));
 
                 $em->persist($user);
                 $em->flush();
