@@ -66,34 +66,27 @@ class UserController extends Controller
 
         if ($request->isMethod(Request::METHOD_POST)) {
 
-            if ($content = $request->getContent()) {
 
-                $content = json_decode($content, true);
-                $em = $this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
 
-                $user = new UserEntity();
-                $user->setEmail($content['email']);
-                $user->setFullName($content['fullname']);
-                $user->setUsername($content['username']);
-                $user->setCreatedAt(new \Datetime('now'));
-                $user->setUpdatedAt(new \Datetime('now'));
+            $user = new UserEntity();
+            $user->setEmail($request->get('email'));
+            $user->setFullName($request->get('fullname'));
+            $user->setUsername($request->get('username'));
+            $user->setRoles(array('ROLE_USER'));
+            $user->setCreatedAt(new \Datetime('now'));
+            $user->setUpdatedAt(new \Datetime('now'));
 
-                $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
+            $userPassword = $this->passwordEncoder->encodePassword($user, $request->get('password'));
+            $user->setPassword($userPassword);
 
-                $user->setPassword($userPassword);
-
-                $em->persist($user);
-                $em->flush();
+            $em->persist($user);
+            $em->flush();
 
 
-                $responseContent = json_encode($this->_getUserInfos($user));
-                return APIResponse::createResponse($responseContent, APIResponse::HTTP_CREATED);
+            $responseContent = json_encode($this->_getUserInfos($user));
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_CREATED);
 
-            } else {
-
-                return APIResponse::createResponse(
-                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NO_CONTENT), APIResponse::HTTP_NO_CONTENT);
-            }
         }
 
 
@@ -108,29 +101,23 @@ class UserController extends Controller
 
         if ($request->isMethod(Request::METHOD_PUT)) {
 
-            if ($content = $request->getContent()) {
+            $em = $this->getDoctrine()->getManager();
 
-                $content = json_decode($content, true);
-                $em = $this->getDoctrine()->getManager();
+            $user = $em->getRepository(UserEntity::class)->find($id);
 
-                $user = $em->getRepository(UserEntity::class)->find($id);
-                $user->setEmail($content['email']);
-                $user->setFullName($content['fullname']);
-                $user->setUsername($content['username']);
-                $user->setRoles($content['roles']);
-                $user->setUpdatedAt(new \Datetime('now'));
+            //TODO: Add security for user not found
 
-                $em->persist($user);
-                $em->flush();
+            $user->setEmail($request->get('email'));
+            $user->setFullName($request->get('fullname'));
+            $user->setUsername($request->get('username'));
+            $user->setUpdatedAt(new \Datetime('now'));
 
-                $responseContent = json_encode($this->_getUserInfos($user));
-                return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+            $em->persist($user);
+            $em->flush();
 
-            } else {
+            $responseContent = json_encode($this->_getUserInfos($user));
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
 
-                return APIResponse::createResponse(
-                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NO_CONTENT), APIResponse::HTTP_NO_CONTENT);
-            }
         }
 
 
@@ -143,16 +130,19 @@ class UserController extends Controller
 
         if ($request->isMethod(Request::METHOD_PUT)) {
 
-            if ($content = $request->getContent()) {
+            $em = $this->getDoctrine()->getManager();
 
-                $content = json_decode($content, true);
-                $em = $this->getDoctrine()->getManager();
+            $user = $em->getRepository(UserEntity::class)->find($id);
 
-                $user = $em->getRepository(UserEntity::class)->find($id);
+            //TODO: Add security for missing user...
 
-                $userPassword = $this->passwordEncoder->encodePassword($user, $content['password']);
+            $currentPassword = $request->get('current_password');
 
-                $user->setPassword($userPassword);
+            if ($this->passwordEncoder->isPasswordValid($user, $currentPassword)) {
+
+                $newPassword = $this->passwordEncoder->encodePassword($user, $request->get('new_password'));
+
+                $user->setPassword($newPassword);
                 $user->setUpdatedAt(new \Datetime('now'));
 
                 $em->persist($user);
@@ -160,14 +150,17 @@ class UserController extends Controller
 
                 $responseContent = json_encode($this->_getUserInfos($user));
                 return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
-
-            } else {
-
-                return APIResponse::createResponse(
-                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NO_CONTENT), APIResponse::HTTP_NO_CONTENT);
             }
+
+            return APIResponse::create(
+                APIResponse::getErrorResponseContent(APIResponse::HTTP_FORBIDDEN),
+                APIResponse::HTTP_FORBIDDEN);
+
         }
 
+        return APIResponse::create(
+            APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
+            APIResponse::HTTP_BAD_REQUEST);
     }
 
     // DELETE
