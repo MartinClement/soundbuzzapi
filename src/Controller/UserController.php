@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\UserEntity;
 use App\Utils\APIResponse;
+use App\Utils\UserUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -31,7 +32,7 @@ class UserController extends Controller
 
         foreach ($users as $user) {
 
-            $_data['users'][] = $this->_getUserInfos($user);
+            $_data['users'][] = UserUtils::getUserInfos($user);
         }
 
         $_data = json_encode($_data);
@@ -54,7 +55,7 @@ class UserController extends Controller
 
         }
 
-        $responseContent = json_encode($this->_getUserInfos($user));
+        $responseContent = json_encode(UserUtils::getUserInfos($user));
         return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
 
 
@@ -84,7 +85,7 @@ class UserController extends Controller
             $em->flush();
 
 
-            $responseContent = json_encode($this->_getUserInfos($user));
+            $responseContent = json_encode(UserUtils::getUserInfos($user));
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_CREATED);
 
         }
@@ -115,7 +116,7 @@ class UserController extends Controller
             $em->persist($user);
             $em->flush();
 
-            $responseContent = json_encode($this->_getUserInfos($user));
+            $responseContent = json_encode(UserUtils::getUserInfos($user));
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
 
         }
@@ -148,7 +149,7 @@ class UserController extends Controller
                 $em->persist($user);
                 $em->flush();
 
-                $responseContent = json_encode($this->_getUserInfos($user));
+                $responseContent = json_encode(UserUtils::getUserInfos($user));
                 return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
             }
 
@@ -182,7 +183,7 @@ class UserController extends Controller
 
             }
 
-            $responseContent = json_encode($this->_getUserInfos($user));
+            $responseContent = json_encode(UserUtils::getUserInfos($user));
 
             $em->remove($user);
             $em->flush();
@@ -195,18 +196,5 @@ class UserController extends Controller
             APIResponse::HTTP_BAD_REQUEST);
     }
 
-//
-// PRIVATE FUNCTIONS
-//
 
-    private function _getUserInfos(UserEntity $user) {
-
-        return array(
-            'id' => $user->getID(),
-            'email' => $user->getEmail(),
-            'fullname' => $user->getFullName(),
-            'username' => $user->getUsername(),
-            'roles' => $user->getRoles()
-        );
-    }
 }

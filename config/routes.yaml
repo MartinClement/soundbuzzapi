@@ -24,4 +24,10 @@ updateuserpassword:
 
 deleteuser:
     path: /deleteuser/{id}
-    controller: App\COntroller\UserController::deleteUser
+    controller: App\Controller\UserController::deleteUser
+
+## LOG IN
+
+login:
+    path: /login
+    controller: App\Controller\LoginController::login
