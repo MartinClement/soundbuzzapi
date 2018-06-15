@@ -23,31 +23,41 @@ class LoginController extends Controller
 
     public function login(Request $req)
     {
-        $em = $this->getDoctrine()->getManager();
 
-        $user = $em->getRepository(UserEntity::class)->findByUsernameOrEmail($req->get('username'))[0];
+        if ($req->getMethod() === Request::METHOD_POST) {
+            $em = $this->getDoctrine()->getManager();
 
-        if (!$user) {
+            $users = $em->getRepository(UserEntity::class)->findByUsernameOrEmail($req->get('username'));
+
+            if (!$users) {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                    APIResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            $user = $users[0];
+            $password = $req->get('password');
+
+            // check password validity
+            if ($this->passwordEncoder->isPasswordValid($user, $password)) {
+
+                $userInfos = json_encode(UserUtils::getUserInfos($user));
+                return APIResponse::createResponse($userInfos, APIResponse::HTTP_OK);
+
+            }
 
             return APIResponse::createResponse(
-                APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
-                APIResponse::HTTP_NOT_FOUND
+                APIResponse::getErrorResponseContent(APIResponse::HTTP_FORBIDDEN),
+                APIResponse::HTTP_FORBIDDEN
             );
         }
 
-        $password = $req->get('password');
-
-        // check password validity
-        if ($this->passwordEncoder->isPasswordValid($user, $password)) {
-
-            $userInfos = json_encode(UserUtils::getUserInfos($user));
-            return APIResponse::createResponse($userInfos, APIResponse::HTTP_OK);
-
-        }
-
         return APIResponse::createResponse(
-            APIResponse::getErrorResponseContent(APIResponse::HTTP_FORBIDDEN),
-            APIResponse::HTTP_FORBIDDEN
+            APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
+            APIResponse::HTTP_BAD_REQUEST
         );
+
     }
 }

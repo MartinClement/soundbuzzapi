@@ -17,7 +17,7 @@ class UserUtils
     public static function getUserInfos(UserEntity $user) {
 
         return array(
-            'id' => $user->getID(),
+            'user_id' => $user->getID(),
             'email' => $user->getEmail(),
             'fullname' => $user->getFullName(),
             'username' => $user->getUsername(),
