@@ -8,6 +8,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Track;
 use App\Entity\UserEntity;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -36,6 +37,24 @@ class AppFixtures extends Fixture
 
             $manager->persist($user);
             $this->addReference($username, $user);
+
+            for ($i = 0; $i < 10; $i++ ) {
+
+                $track = new Track();
+                $track
+                    ->setOwner($user)
+                    ->setTitle('track-' . $i)
+                    ->setPlayedTimes(0)
+                    ->setDowloadedTimes(0)
+                    ->setLikes(0)
+                    ->setLength(3600)
+                    ->setExplicit(false)
+                    ->setDownloadable(1)
+                    ->setCreatedAt(new \DateTime('now'))
+                    ->setUpdatedAt(new \DateTime('now'));
+
+                $manager->persist($track);
+            }
         }
 
         $manager->flush();

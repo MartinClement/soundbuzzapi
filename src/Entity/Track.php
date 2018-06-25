@@ -57,6 +57,17 @@ class Track
      */
     private $owner;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated_at;
+
+
     public function getId()
     {
         return $this->id;
@@ -156,5 +167,29 @@ class Track
         $this->owner = $owner;
 
         return $this;
+    }
+
+    public function setCreatedAt(\DateTime $date)
+    {
+        $this->created_at = $date;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTime $date)
+    {
+        $this->updated_at = $date;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
     }
 }
