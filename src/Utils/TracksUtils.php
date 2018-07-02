@@ -14,6 +14,13 @@ use App\Entity\Track;
 class TracksUtils
 {
 
+    const QUERY_PARAMS_MAP = array(
+        'date' => 'created_at',
+        'likes' => 'likes',
+        'length' => 'length',
+        'playedtimes' => 'played_times'
+    );
+
     public static function getTrackInfos(Track $track)
     {
 

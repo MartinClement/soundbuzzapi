@@ -19,13 +19,12 @@ class APIResponse extends Response
 
     public static function createResponse($content, $statusCode, $contentType = self::DEFAULT_CONTENT_TYPE) {
 
-        $response = New Response();
 
-        $response->setContent($content);
-        $response->setStatusCode($statusCode);
-        $response->headers->set('Content-type', 'application/json');
-
-        return $response;
+        return new Response(
+            $content,
+            $statusCode,
+            array('content-type' => $contentType)
+        );
     }
 
     public static function getErrorResponseContent($code) {

@@ -17,9 +17,29 @@ class TrackController extends Controller
     // GET
     //
 
-    public function getTracks() {
+    public function getTracks(Request $req) {
 
-        $tracks = $this->getDoctrine()->getRepository(Track::class)->findAll();
+        $queryParams = $req->query->all();
+
+        if(empty($queryParams)) {
+
+            $tracks = $this->getDoctrine()->getRepository(Track::class)->findAll();
+
+        } else {
+
+            $options = array();
+
+            foreach ($queryParams as $param => $value) {
+
+                $options[TracksUtils::QUERY_PARAMS_MAP[$param]] = $value;
+            }
+
+            $tracks = $this
+                ->getDoctrine()
+                ->getRepository(Track::class)
+                ->findBy([], $options);
+        }
+
 
         $_data = array('tracks' => array());
 
@@ -29,6 +49,7 @@ class TrackController extends Controller
         }
 
         $_data = json_encode($_data);
+
 
         return APIResponse::createResponse($_data, APIResponse::HTTP_OK);
 
