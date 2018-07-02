@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PhpParser\Node\Scalar\String_;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TrackRepository")
@@ -20,6 +23,18 @@ class Track
      * @ORM\Column(type="string", length=60)
      */
     private $title;
+
+    /**
+     * @var string
+     * @ORM\Column(name="track", type="string")
+     *
+     *@Assert\NotBlank(message="Upload the track as mp3, wav or flac file.")
+     *@Assert\File(
+     * mimeTypes = {"tracks/mp3", "tracks/wav", "tracks/flac"},
+     * mimeTypesMessage = "Please upload a valid Picture"
+     *)
+     */
+    private $track;
 
     /**
      * @ORM\Column(type="integer")
@@ -67,6 +82,11 @@ class Track
      */
     private $updated_at;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $validated;
+
 
     public function getId()
     {
@@ -82,6 +102,18 @@ class Track
     {
         $this->title = $title;
 
+        return $this;
+    }
+
+    public function getTrack(): ?string
+    {
+
+        return $this->track;
+    }
+
+    public function setTrack($track): self
+    {
+        $this->track = $track;
         return $this;
     }
 
@@ -191,5 +223,16 @@ class Track
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
+    }
+
+    public function getValidated(): ?bool
+    {
+        return $this->validated;
+    }
+
+    public function setValidated(bool $isValidated): self
+    {
+        $this->validated = $isValidated;
+        return $this;
     }
 }

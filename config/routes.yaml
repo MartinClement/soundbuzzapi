@@ -2,6 +2,9 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 
+
+## USER
+
 users:
     path: /users
     controller: App\Controller\UserController::getUsers
@@ -31,3 +34,39 @@ deleteuser:
 login:
     path: /login
     controller: App\Controller\LoginController::login
+
+## TRACK
+
+track:
+    path: /track/{id}
+    controller: App\Controller\TrackController::getTrackById
+
+tracks:
+    path: /tracks
+    controller: App\Controller\TrackController::getTracks
+
+usertracks:
+    path: /usertracks/{id}
+    controller: App\Controller\TrackController::getUserTracks
+
+addtrack:
+    path: /addtrack
+    controller: App\Controller\TrackController::addTrack
+
+## PLAYLIST
+
+playlists:
+    path: /playlists
+    controller: App\Controller\PlaylistController::getPlaylists
+
+playlist:
+    path: /playlist/{id}
+    controller: App\Controller\PlaylistController::getPlaylistById
+
+userplaylists:
+    path: /userplaylists/{id}
+    controller: App\Controller\PlaylistController::getUserPlaylists
+
+playlisttracks:
+    path: /playlisttracks/{id}
+    controller: App\Controller\PlaylistController::getPlaylistTracks

@@ -20,13 +20,26 @@ class Playlist
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\UserEntity")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $owner;
+
+    /**
+     * @ORM\Column(type="string", length=60)
+     */
+    private $title;
+
+    /**
+     * @ORM\Column(name="description", type="text", length=500, nullable=true)
+     */
+    private $description;
+
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Track")
      */
     private $tracks;
+
 
     public function __construct()
     {
@@ -49,6 +62,29 @@ class Playlist
 
         return $this;
     }
+
+    public function getTitle(): String
+    {
+        return $this->title;
+    }
+
+    public function setTitle(String $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function getDescription(): String
+    {
+        return $this->description;
+    }
+
+    public function setDescription(String $desc): self
+    {
+        $this->description = $desc;
+        return $this;
+    }
+
 
     /**
      * @return Collection|Track[]

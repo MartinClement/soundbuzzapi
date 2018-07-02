@@ -8,10 +8,12 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Playlist;
 use App\Entity\Track;
 use App\Entity\UserEntity;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
@@ -38,12 +40,23 @@ class AppFixtures extends Fixture
             $manager->persist($user);
             $this->addReference($username, $user);
 
+            $playlist = new Playlist();
+            $playlist
+                ->setOwner($user)
+                ->setTitle('wonderfull playlist')
+                ->setDescription('Hi, I\'m ' . $fullname . ' and this is ma wonderfull playlist');
+
+            $path = '/home/clement/www/symfony/soundbuzzAPI/src/DataFixtures/';
+
+            $trackFile = new UploadedFile($path . 'Rone_Nakt.mp3', 'Rone_Nakt');
+
             for ($i = 0; $i < 10; $i++ ) {
 
                 $track = new Track();
                 $track
                     ->setOwner($user)
                     ->setTitle('track-' . $i)
+                    ->setTrack($trackFile)
                     ->setPlayedTimes(0)
                     ->setDowloadedTimes(0)
                     ->setLikes(0)
@@ -51,10 +64,17 @@ class AppFixtures extends Fixture
                     ->setExplicit(false)
                     ->setDownloadable(1)
                     ->setCreatedAt(new \DateTime('now'))
-                    ->setUpdatedAt(new \DateTime('now'));
+                    ->setUpdatedAt(new \DateTime('now'))
+                    ->setValidated(false);
 
                 $manager->persist($track);
+
+                // Add track to playlist
+
+                $playlist->addTrack($track);
             }
+
+            $manager->persist($playlist);
         }
 
         $manager->flush();
