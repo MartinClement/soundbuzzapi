@@ -30,7 +30,7 @@ class TracksUtils
             'explicit' => $track->getExplicit(),
             'downlodable' => $track->getDownloadable(),
             'created_at' => $track->getCreatedAt()->format('d-m-Y'),
-            'updated' => $track->getUpdatedAt()->format('d-m-Y'),
+            'updated' => $track->getUpdatedAt()->format('d-m-Y')
         );
     }
 }

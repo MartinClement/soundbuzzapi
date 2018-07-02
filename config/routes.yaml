@@ -53,6 +53,18 @@ addtrack:
     path: /addtrack
     controller: App\Controller\TrackController::addTrack
 
+removetrack:
+    path: /removetrack/{id}
+    controller: App\Controller\TrackController::removeTrack
+
+addlike:
+    path: /addlike/{id}
+    controller: App\Controller\TrackController::addLike
+
+removelike:
+    path: /removelike/{id}
+    controller: App\Controller\TrackController::removeLike
+
 ## PLAYLIST
 
 playlists:

@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Entity\Track;
 use App\Entity\UserEntity;
 use App\Utils\APIResponse;
-use App\Utils\FileUtils;
 use App\Utils\TracksUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TrackController extends Controller
 {
@@ -91,8 +91,6 @@ class TrackController extends Controller
     // POST
     //
 
-    // POST
-
     public function addTrack(Request $req) {
 
         if ($req->isMethod(Request::METHOD_POST)) {
@@ -110,12 +108,6 @@ class TrackController extends Controller
 
             $date = new \DateTime('now');
 
-            var_dump($req->getContent());
-
-            $trackFile = $req->get('track_file');
-
-            $trackFileName = FileUtils::getUniqueFileName() . '.' . $trackFile->guessExtension();
-
             $track = new Track();
             $track
                 ->setOwner($user)
@@ -128,31 +120,121 @@ class TrackController extends Controller
                 ->setDownloadable($req->get('downloadable'))
                 ->setCreatedAt($date)
                 ->setUpdatedAt($date)
-                ->setTrack($trackFileName)
+                ->setTrack($req->get('track_url'))
                 ->setValidated(false);
 
             $em->persist($track);
             $em->flush();
 
-            // upload the file on se API storage
-
-            $trackFile->move(
-                $this->getParameter('tracks_directory'),
-                $trackFileName
-            );
-
-
-            $responseContent = json_encode(UserUtils::getUserInfos($user));
+            $responseContent = json_encode(TracksUtils::getTrackInfos($track));
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_CREATED);
 
         }
 
+        return APIResponse::create(
+            APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
+            APIResponse::HTTP_BAD_REQUEST);
+    }
+
+    //
+    // DELETE
+    //
+
+    public function removeTrack(Request $req, $id) {
+
+        if ($req->isMethod(Request::METHOD_DELETE)) {
+
+
+            $em = $this->getDoctrine()->getManager();
+
+            $track = $em->getRepository(Track::class)->find($id);
+
+            if(!$track) {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                    APIResponse::HTTP_NOT_FOUND);
+
+            }
+
+            $responseContent = json_encode(TracksUtils::getTrackInfos($track));
+
+            $em->remove($track);
+            $em->flush();
+
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+        }
+
+        return APIResponse::create(
+            APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
+            APIResponse::HTTP_BAD_REQUEST);
+    }
+
+    //
+    // PATCH
+    //
+
+    public function addLike(Request $req, $id) {
+
+        if ($req->isMethod(Request::METHOD_DELETE)) {
+
+
+            $em = $this->getDoctrine()->getManager();
+
+            $track = $em->getRepository(Track::class)->find($id);
+
+            if(!$track) {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                    APIResponse::HTTP_NOT_FOUND);
+
+            }
+
+            $track->setLikes($track->getLikes() + 1);
+
+            $responseContent = json_encode(TracksUtils::getTrackInfos($track));
+
+            $em->remove($track);
+            $em->flush();
+
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+        }
+
+        return APIResponse::create(
+            APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
+            APIResponse::HTTP_BAD_REQUEST);
+    }
+
+    public function removeLike(Request $req, $id) {
+
+        if ($req->isMethod(Request::METHOD_DELETE)) {
+
+
+            $em = $this->getDoctrine()->getManager();
+
+            $track = $em->getRepository(Track::class)->find($id);
+
+            if(!$track) {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                    APIResponse::HTTP_NOT_FOUND);
+
+            }
+
+            $track->setLikes($track->getLikes() - 1);
+
+            $responseContent = json_encode(TracksUtils::getTrackInfos($track));
+
+            $em->remove($track);
+            $em->flush();
+
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+        }
 
         return APIResponse::create(
             APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
             APIResponse::HTTP_BAD_REQUEST);
     }
 }
-
-
-git add composer.json composer.lock config/routes.yaml config/services.yaml src/DataFixtures/AppFixtures.php src/Entity/Playlist.php src/Entity/Track.php src/Utils/UserUtils.php symfony.lock src/Utils/TracksUtils.php src/Utils/PlaylistUtils.php src/Utils/FileUtils.php src/Repository/TracKCommentaryRepository.php src/Repository/PlaylistCommentaryRepository.php src/Entity/TracKCommentary.php src/Entity/PlaylistCommentary.php src/DataFixtures/Rone_Nakt.mp3 src/Controller/TrackController.php src/Controller/PlaylistController.php public/tracks/ public/covers/ config/packages/translation.yaml

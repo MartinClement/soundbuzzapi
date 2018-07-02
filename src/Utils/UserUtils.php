@@ -14,7 +14,8 @@ use App\Entity\UserEntity;
 class UserUtils
 {
 
-    public static function getUserInfos(UserEntity $user) {
+    public static function getUserInfos(UserEntity $user)
+    {
 
         return array(
             'user_id' => $user->getId(),
