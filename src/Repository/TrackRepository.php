@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Track;
+use App\Utils\TracksUtils;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -18,6 +19,30 @@ class TrackRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Track::class);
     }
+
+    public function findByOptions($options, $limit = null, $offset = null)
+    {
+
+        $query = $this->createQueryBuilder('t');
+
+        foreach ($options as $opt => $value) {
+
+            $query->orderBy('t.' . TracksUtils::QUERY_PARAMS_MAP[$opt], $value);
+        }
+
+        if (isset($limit)) {
+
+            $query->setMaxResults($options['limit']);
+        }
+
+        if (isset($offset)) {
+
+            $query->setFirstResult($options['offset']);
+        }
+
+        $query->getQuery()->getResult();
+    }
+
 
 //    /**
 //     * @return Track[] Returns an array of Track objects

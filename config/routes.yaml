@@ -58,7 +58,7 @@ removetrack:
     controller: App\Controller\TrackController::removeTrack
 
 addlike:
-    path: /addlike/{id}
+    path: /addlike/{userId}/{trackId}
     controller: App\Controller\TrackController::addLike
 
 removelike:

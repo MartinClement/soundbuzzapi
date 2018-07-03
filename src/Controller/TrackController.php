@@ -31,21 +31,26 @@ class TrackController extends Controller
 
             foreach ($queryParams as $param => $value) {
 
-                $options[TracksUtils::QUERY_PARAMS_MAP[$param]] = $value;
+                if (array_key_exists($param, TracksUtils::QUERY_PARAMS_MAP)) {
+
+                    $options[TracksUtils::QUERY_PARAMS_MAP[$param]] = $value;
+                }
             }
 
-            $tracks = $this
-                ->getDoctrine()
-                ->getRepository(Track::class)
-                ->findBy([], $options);
+            $tracksRep = $this->getDoctrine()->getRepository(Track::class);
+
+            $limit = array_key_exists('limit', $queryParams) ? $queryParams['limit'] : null;
+            $offset = array_key_exists('offset', $queryParams) ? $queryParams['offset'] : null;
+
+            $tracks = $this->getDoctrine()->getRepository(Track::class)->findByOptions($options, $limit, $offset);
         }
 
 
-        $_data = array('tracks' => array());
+        $_data = array();
 
         foreach ($tracks as $track) {
 
-            $_data['tracks'][] = TracksUtils::getTrackInfos($track);
+            $_data[] = TracksUtils::getTrackInfos($track);
         }
 
         $_data = json_encode($_data);
@@ -127,6 +132,13 @@ class TrackController extends Controller
                     APIResponse::HTTP_BAD_REQUEST);
             }
 
+
+            $track = array(
+                array('title' => 'track_1','artist' => 'user1', 'like' => 500),
+                array('title' => 'track_2','artist' => 'user2', 'like' => 250),
+                array('title' => 'track_3','artist' => 'user3', 'like' => 100)
+                );
+
             $date = new \DateTime('now');
 
             $track = new Track();
@@ -195,14 +207,14 @@ class TrackController extends Controller
     // PATCH
     //
 
-    public function addLike(Request $req, $id) {
+    public function addLike(Request $req, $userId, $trackId) {
 
-        if ($req->isMethod(Request::METHOD_DELETE)) {
+        if ($req->isMethod(Request::METHOD_POST)) {
 
 
             $em = $this->getDoctrine()->getManager();
 
-            $track = $em->getRepository(Track::class)->find($id);
+            $track = $em->getRepository(Track::class)->find($trackId);
 
             if(!$track) {
 
@@ -216,7 +228,7 @@ class TrackController extends Controller
 
             $responseContent = json_encode(TracksUtils::getTrackInfos($track));
 
-            $em->remove($track);
+            $em->persist($track);
             $em->flush();
 
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
@@ -227,14 +239,14 @@ class TrackController extends Controller
             APIResponse::HTTP_BAD_REQUEST);
     }
 
-    public function removeLike(Request $req, $id) {
+    public function removeLike(Request $req, $userId, $trackId) {
 
         if ($req->isMethod(Request::METHOD_DELETE)) {
 
 
             $em = $this->getDoctrine()->getManager();
 
-            $track = $em->getRepository(Track::class)->find($id);
+            $track = $em->getRepository(Track::class)->find($trackId);
 
             if(!$track) {
 
@@ -248,7 +260,7 @@ class TrackController extends Controller
 
             $responseContent = json_encode(TracksUtils::getTrackInfos($track));
 
-            $em->remove($track);
+            $em->persist($track);
             $em->flush();
 
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
