@@ -146,12 +146,6 @@ class TrackController extends Controller
             }
 
 
-            $track = array(
-                array('title' => 'track_1','artist' => 'user1', 'like' => 500),
-                array('title' => 'track_2','artist' => 'user2', 'like' => 250),
-                array('title' => 'track_3','artist' => 'user3', 'like' => 100)
-                );
-
             $date = new \DateTime('now');
 
             $track = new Track();
@@ -166,7 +160,8 @@ class TrackController extends Controller
                 ->setDownloadable($req->get('downloadable'))
                 ->setCreatedAt($date)
                 ->setUpdatedAt($date)
-                ->setTrack($req->get('track_url'))
+                ->setTrackUrl($req->get('track'))
+                ->setCoverUrl($req->get('picture'))
                 ->setValidated(false);
 
             $em->persist($track);
@@ -222,7 +217,7 @@ class TrackController extends Controller
 
     public function addLike(Request $req, $userId, $trackId) {
 
-        if ($req->isMethod(Request::METHOD_POST)) {
+        if ($req->isMethod(Request::METHOD_PATCH)) {
 
 
             $em = $this->getDoctrine()->getManager();
@@ -254,7 +249,7 @@ class TrackController extends Controller
 
     public function removeLike(Request $req, $userId, $trackId) {
 
-        if ($req->isMethod(Request::METHOD_DELETE)) {
+        if ($req->isMethod(Request::METHOD_PATCH)) {
 
 
             $em = $this->getDoctrine()->getManager();
@@ -282,5 +277,30 @@ class TrackController extends Controller
         return APIResponse::create(
             APIResponse::getErrorResponseContent(APIResponse::HTTP_BAD_REQUEST),
             APIResponse::HTTP_BAD_REQUEST);
+    }
+
+    public function addPlayedTime(Request $req, $id) {
+
+            $em = $this->getDoctrine()->getManager();
+
+            $track = $em->getRepository(Track::class)->find($id);
+
+            if(!$track) {
+
+                return APIResponse::createResponse(
+                    APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                    APIResponse::HTTP_NOT_FOUND);
+
+            }
+
+            $track->setPlayedTimes($track->getPlayedTimes() + 1);
+
+            $responseContent = json_encode(TracksUtils::getTrackInfos($track));
+
+            $em->persist($track);
+            $em->flush();
+
+            return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
+
     }
 }

@@ -65,6 +65,10 @@ removelike:
     path: /removelike/{id}
     controller: App\Controller\TrackController::removeLike
 
+addplayedtime:
+    path: /addplayedtime/{id}
+    controller: App\Controller\TrackController::addPlayedTime
+
 ## PLAYLIST
 
 playlists:

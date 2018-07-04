@@ -30,6 +30,11 @@ class Track
     private $trackurl;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    private $coverurl;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $played_times;
@@ -103,9 +108,21 @@ class Track
         return $this->trackurl;
     }
 
-    public function setTrack($trackurl): self
+    public function setTrackUrl($trackurl): self
     {
         $this->trackurl = $trackurl;
+        return $this;
+    }
+
+    public function getCoverUrl(): ?string
+    {
+
+        return $this->coverurl;
+    }
+
+    public function setCoverUrl($coverUrl): self
+    {
+        $this->coverurl = $coverUrl;
         return $this;
     }
 
