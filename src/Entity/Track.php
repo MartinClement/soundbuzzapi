@@ -25,16 +25,9 @@ class Track
     private $title;
 
     /**
-     * @var string
-     * @ORM\Column(name="track", type="string")
-     *
-     *@Assert\NotBlank(message="Upload the track as mp3, wav or flac file.")
-     *@Assert\File(
-     * mimeTypes = {"tracks/mp3", "tracks/wav", "tracks/flac"},
-     * mimeTypesMessage = "Please upload a valid Picture"
-     *)
+     * @ORM\Column(type="string")
      */
-    private $track;
+    private $trackurl;
 
     /**
      * @ORM\Column(type="integer")
@@ -87,7 +80,6 @@ class Track
      */
     private $validated;
 
-
     public function getId()
     {
         return $this->id;
@@ -105,15 +97,15 @@ class Track
         return $this;
     }
 
-    public function getTrack(): ?string
+    public function getTrackUrl(): ?string
     {
 
-        return $this->track;
+        return $this->trackurl;
     }
 
-    public function setTrack($track): self
+    public function setTrack($trackurl): self
     {
-        $this->track = $track;
+        $this->trackurl = $trackurl;
         return $this;
     }
 
@@ -235,4 +227,5 @@ class Track
         $this->validated = $isValidated;
         return $this;
     }
+
 }

@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Track;
+use App\Entity\TrackComment;
 use App\Entity\UserEntity;
 use App\Utils\APIResponse;
+use App\Utils\CommentUtils;
 use App\Utils\TracksUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +44,7 @@ class TrackController extends Controller
             $limit = array_key_exists('limit', $queryParams) ? $queryParams['limit'] : null;
             $offset = array_key_exists('offset', $queryParams) ? $queryParams['offset'] : null;
 
-            $tracks = $this->getDoctrine()->getRepository(Track::class)->findByOptions($options, $limit, $offset);
+            $tracks = $tracksRep->findByOptions($options, $limit, $offset);
         }
 
 
@@ -54,7 +56,6 @@ class TrackController extends Controller
         }
 
         $_data = json_encode($_data);
-
 
         return APIResponse::createResponse($_data, APIResponse::HTTP_OK);
 
@@ -74,7 +75,19 @@ class TrackController extends Controller
             );
         }
 
-        $_data = TracksUtils::getTrackInfos($track);
+        $_data = array(
+            TracksUtils::getTrackInfos($track),
+            'comments'=> array()
+        );
+
+        $comments = $this->getDoctrine()->getRepository(TrackComment::class)
+            ->findBy(array('track' => $track), array('created_at' => 'desc'));
+
+        foreach ( $comments as $comment) {
+
+            $_data['comments'][] = CommentUtils::getCommentInfos($comment);
+        }
+
         $_data = json_encode($_data);
 
         return APIResponse::createResponse($_data, APIResponse::HTTP_OK);

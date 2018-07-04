@@ -3,8 +3,12 @@
 namespace App\Controller;
 
 
+use App\Entity\Playlist;
+use App\Entity\Track;
 use App\Entity\UserEntity;
 use App\Utils\APIResponse;
+use App\Utils\PlaylistUtils;
+use App\Utils\TracksUtils;
 use App\Utils\UserUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,9 +47,11 @@ class UserController extends Controller
 
     public function getUserById($id) {
 
-        $user = $this->getDoctrine()
-            ->getRepository(UserEntity::class)
-            ->find($id);
+        $userRep = $this->getDoctrine()->getRepository(UserEntity::class);
+        $trackRep = $this->getDoctrine()->getRepository(Track::class);
+        $playlistRep = $this->getDoctrine()->getRepository(Playlist::class);
+
+        $user = $userRep->find($id);
 
         if(!$user) {
 
@@ -55,7 +61,23 @@ class UserController extends Controller
 
         }
 
-        $responseContent = json_encode(UserUtils::getUserInfos($user));
+        $userData = array('user' => UserUtils::getUserInfos($user), 'tracks' => [], 'playlists' => []);
+
+        $userTracks = $trackRep->findBy(array('owner' => $user));
+        foreach ( $userTracks as $track) {
+
+            $userData['tracks'][] = TracksUtils::getTrackInfos($track);
+        }
+
+        $userPlaylists = $playlistRep->findBy(array('owner' => $user));
+
+        foreach ($userPlaylists as $pl) {
+
+            $userData['playlists'][] = PlaylistUtils::getPlaylistInfos($pl);
+        }
+
+
+        $responseContent = json_encode($userData);
         return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
 
 

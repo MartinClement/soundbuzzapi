@@ -27,20 +27,21 @@ class TrackRepository extends ServiceEntityRepository
 
         foreach ($options as $opt => $value) {
 
-            $query->orderBy('t.' . TracksUtils::QUERY_PARAMS_MAP[$opt], $value);
+            $query->orderBy('t.' . $opt, $value);
         }
 
         if (isset($limit)) {
 
-            $query->setMaxResults($options['limit']);
+            $query->setMaxResults($limit);
+
         }
 
         if (isset($offset)) {
 
-            $query->setFirstResult($options['offset']);
+            $query->setFirstResult($offset);
         }
 
-        $query->getQuery()->getResult();
+        return $query->getQuery()->getResult();
     }
 
 
