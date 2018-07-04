@@ -27,6 +27,8 @@ class TracksUtils
         return array(
             'track_id' => $track->getId(),
             'track' => $track->getTrackUrl(),
+            'cover' => $track->getCoverUrl(),
+            'genre' => $track->getGenre(),
             'owner' => $track->getOwner()->getUsername(),
             'owner_id' => $track->getOwner()->getId(),
             'title' => $track->getTitle(),

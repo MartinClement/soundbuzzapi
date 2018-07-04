@@ -73,7 +73,9 @@ class AppFixtures extends Fixture
                 $track
                     ->setOwner($user)
                     ->setTitle('track-' . $i)
-                    ->setTrack($path)
+                    ->setTrackUrl($path)
+                    ->setCoverUrl('http://bobjames.com/wp-content/themes/soundcheck/images/default-album-artwork.png')
+                    ->setGenre($this->getGenre())
                     ->setPlayedTimes(random_int(0, 1000))
                     ->setDowloadedTimes(random_int(0, 1000))
                     ->setLikes(random_int(0, 500))
@@ -125,7 +127,20 @@ class AppFixtures extends Fixture
         ];
     }
 
-    public function getFixtureUserComment() {
+    private function getGenre(){
+
+        $genres = array(
+            'Musique Classique',
+            'Electro',
+            'Jazz',
+            'R&B'
+        );
+
+        return $genres[random_int(0, sizeof($genres) - 1)];
+
+    }
+
+    private function getFixtureUserComment() {
 
         $comments = array(
             'Wow ! This song rocks !!',

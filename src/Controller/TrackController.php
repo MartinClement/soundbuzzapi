@@ -134,9 +134,10 @@ class TrackController extends Controller
 
         if ($req->isMethod(Request::METHOD_POST)) {
 
+            $userId = intval($req->get('user_id'));
 
             $em = $this->getDoctrine()->getManager();
-            $user = $em->getRepository(UserEntity::class)->find($req->get('user_id'));
+            $user = $em->getRepository(UserEntity::class)->find($userId);
 
             if (!$user) {
 
@@ -153,6 +154,7 @@ class TrackController extends Controller
                 ->setOwner($user)
                 ->setTitle($req->get('title'))
                 ->setPlayedTimes(0)
+                ->setGenre($req->get('genre'))
                 ->setDowloadedTimes(0)
                 ->setLikes(0)
                 ->setlength(145)
