@@ -33,6 +33,8 @@ class AppFixtures extends Fixture
         $fictureUser->setUsername('J_Fixture');
         $fictureUser->setPassword($this->passwordEncoder->encodePassword($fictureUser, "kitten"));
         $fictureUser->setEmail('johnfixtures@symfony.com');
+        $fictureUser->setValidationToken(md5(uniqid()));
+        $fictureUser->setIsValidated(true);
         $fictureUser->setCreatedAt(new \Datetime('now'));
         $fictureUser->setUpdatedAt(new \Datetime('now'));
         $fictureUser->setRoles(array('ROLE_USER'));
@@ -47,6 +49,8 @@ class AppFixtures extends Fixture
             $user->setUsername($username);
             $user->setPassword($this->passwordEncoder->encodePassword($user, $password));
             $user->setEmail($email);
+            $user->setValidationToken(md5(uniqid()));
+            $user->setIsValidated(true);
             $user->setCreatedAt(new \Datetime('now'));
             $user->setUpdatedAt(new \Datetime('now'));
             $user->setRoles($roles);

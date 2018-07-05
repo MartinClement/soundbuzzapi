@@ -56,6 +56,20 @@ class UserEntity implements UserInterface, \Serializable
     private $password;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     */
+    private $validation_token;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $is_validated;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
@@ -120,6 +134,31 @@ class UserEntity implements UserInterface, \Serializable
     {
         $this->password = $password;
     }
+
+    public function getValidationToken(): ?string
+    {
+        return $this->validation_token;
+    }
+
+    public function setValidationToken(string $token): void
+    {
+        $this->validation_token = $token;
+
+    }
+
+    public function getIsValidated(): ?bool
+    {
+        return $this->is_validated;
+    }
+
+    public function setIsValidated(bool $value): self
+    {
+        $this->is_validated = $value;
+
+        return $this;
+    }
+
+
 
     public function getCreatedAt(): \DateTime
     {

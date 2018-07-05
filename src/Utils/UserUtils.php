@@ -22,7 +22,8 @@ class UserUtils
             'email' => $user->getEmail(),
             'fullname' => $user->getFullName(),
             'username' => $user->getUsername(),
-            'roles' => $user->getRoles()
+            'roles' => $user->getRoles(),
+            'validated' => $user->getIsValidated()
         );
     }
 

@@ -17,6 +17,10 @@ adduser:
     path: /adduser
     controller: App\Controller\UserController::addUser
 
+validateuser:
+    path: /validate/inscription
+    controller: App\Controller\UserController::validateUser
+
 updateuser:
     path: /updateuser/{id}
     controller: App\Controller\UserController::updateUser

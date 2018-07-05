@@ -12,7 +12,9 @@ use App\Utils\TracksUtils;
 use App\Utils\UserUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
 
 class UserController extends Controller
 {
@@ -83,20 +85,47 @@ class UserController extends Controller
 
     }
 
+    public function validateUser(Request $req) {
+
+        $token = $req->query->get('token');
+
+        $em = $this->getDoctrine()->getManager();
+
+        $user = $em->getRepository(UserEntity::class)->findBy(array('validation_token' => $token))[0];
+
+        if (!$user) {
+
+            return new Response('<h1>API ERROR : USER NOT FOUND</h1>');
+
+        }
+
+        $user->setIsValidated(true);
+
+        $em->persist($user);
+        $em->flush();
+
+        //return new Response('<h1> Inscription Validée </h1>');
+        return $this->redirect('http://localhost:8000/login');
+    }
+
     // POST
 
-    public function addUser(Request $request) {
+    public function addUser(Request $request, \Swift_Mailer $mailer) {
 
         if ($request->isMethod(Request::METHOD_POST)) {
 
 
             $em = $this->getDoctrine()->getManager();
 
+            $validationToken = md5($request->get('email').uniqid());
+
             $user = new UserEntity();
             $user->setEmail($request->get('email'));
             $user->setFullName($request->get('fullname'));
             $user->setUsername($request->get('username'));
             $user->setRoles(array('ROLE_USER'));
+            $user->setIsValidated(false);
+            $user->setValidationToken($validationToken);
             $user->setCreatedAt(new \Datetime('now'));
             $user->setUpdatedAt(new \Datetime('now'));
 
@@ -106,9 +135,21 @@ class UserController extends Controller
             $em->persist($user);
             $em->flush();
 
+            $message = (new \Swift_Message('Soundbuzz bienvenue !'))
+                ->setFrom('soundbuzz@signup.com')
+                ->setTo($request->get('email'))
+                ->setBody(
+                    '<h1>SoundBuzz : Bienvenue !</h1>
+                          <p>Afin de compléter votre inscription, veuillez cliquer sur le lien suivant :</p>
+                          <a href="http://localhost:8001/validate/inscription/?token=' .$validationToken.'">Valider mon inscription</a>'
+                );
+
+            $mailer->send($message);
 
             $responseContent = json_encode(UserUtils::getUserInfos($user));
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_CREATED);
+
+
 
         }
 

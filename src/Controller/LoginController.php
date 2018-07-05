@@ -29,7 +29,7 @@ class LoginController extends Controller
 
             $users = $em->getRepository(UserEntity::class)->findByUsernameOrEmail($req->get('username'));
 
-            if (!$users) {
+            if (!$users || !$users[0]->getIsValidated()) {
 
                 return APIResponse::createResponse(
                     APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
