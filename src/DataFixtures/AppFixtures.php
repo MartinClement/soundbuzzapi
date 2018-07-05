@@ -67,7 +67,7 @@ class AppFixtures extends Fixture
                 ->setTitle('wonderfull playlist')
                 ->setDescription('Hi, I\'m ' . $fullname . ' and this is ma wonderfull playlist');
 
-            $path = 'http://localhost:8000/track/Recording%201.mp3';
+            $path = 'http://localhost:8000/track/track_default.mpga';
 
             //$trackFile = new UploadedFile($path . 'Rone_Nakt.mp3', 'Rone_Nakt');
 

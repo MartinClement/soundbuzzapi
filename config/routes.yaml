@@ -81,6 +81,10 @@ invalidtracks:
     path: /invalidtracks
     controller: App\Controller\TrackController::getInvalidTracks
 
+validtracks:
+    path: /validtracks
+    controller: App\Controller\TrackController::getValidTracks
+
 ## PLAYLIST
 
 playlists:
