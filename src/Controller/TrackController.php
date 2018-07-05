@@ -126,6 +126,23 @@ class TrackController extends Controller
 
     }
 
+    public function getInvalidTracks() {
+
+        $tracks = $this->getDoctrine()->getManager()->getRepository(Track::class)
+            ->findBy(array('validated' => false));
+
+        $_data = array();
+
+        foreach ($tracks as $track) {
+
+            $_data[] = TracksUtils::getTrackInfos($track);
+        }
+
+        $_data = json_encode($_data);
+
+        return APIResponse::createResponse($_data, APIResponse::HTTP_OK);
+    }
+
     //
     // POST
     //
@@ -304,5 +321,29 @@ class TrackController extends Controller
 
             return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
 
+    }
+
+    public function validateTrack($id) {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $track = $em->getRepository(Track::class)->find($id);
+
+        if(!$track) {
+
+            return APIResponse::createResponse(
+                APIResponse::getErrorResponseContent(APIResponse::HTTP_NOT_FOUND),
+                APIResponse::HTTP_NOT_FOUND);
+        }
+
+
+        $track->setValidated(true);
+
+        $responseContent = json_encode(TracksUtils::getTrackInfos($track));
+
+        $em->persist($track);
+        $em->flush();
+
+        return APIResponse::createResponse($responseContent, APIResponse::HTTP_OK);
     }
 }

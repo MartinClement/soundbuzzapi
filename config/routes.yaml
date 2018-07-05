@@ -73,6 +73,14 @@ addplayedtime:
     path: /addplayedtime/{id}
     controller: App\Controller\TrackController::addPlayedTime
 
+validatetrack:
+    path: /validatetrack/{id}
+    controller: App\Controller\TrackController::validateTrack
+
+invalidtracks:
+    path: /invalidtracks
+    controller: App\Controller\TrackController::getInvalidTracks
+
 ## PLAYLIST
 
 playlists:
